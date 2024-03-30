@@ -23,7 +23,7 @@ U0 = [0;
 TF = 60;
 
 %% Run the model:
-sim('RCAM_SimulinkModel_MeasurementsIncluded.slx')
+sim('RCAM_SimulinkModel.slx')
 
 %% Plot the results:
 
