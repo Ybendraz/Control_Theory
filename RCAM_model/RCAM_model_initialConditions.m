@@ -51,58 +51,58 @@ subplot(5,2,1)
 plot(t,x1)
 grid on
 xlabel("Time(s)")
-legend("x1")
+legend("u")
 
 subplot(5,2,2)
 plot(t,x2)
 grid on
 xlabel("Time(s)")
-legend("x2")
+legend("v")
 
 
 subplot(5,2,3)
 plot(t,x3)
 grid on
 xlabel("Time(s)")
-legend("x3")
+legend("w")
 
 
 subplot(5,2,4)
 plot(t,x4)
 grid on
 xlabel("Time(s)")
-legend("x4")
+legend("p")
 
 
 subplot(5,2,5)
 plot(t,x5)
 grid on
 xlabel("Time(s)")
-legend("x5")
+legend("q")
 
 subplot(5,2,6)
 plot(t,x6)
 grid on
 xlabel("Time(s)")
-legend("x6")
+legend("r")
 
 subplot(5,2,7)
 plot(t,x7)
 grid on
 xlabel("Time(s)")
-legend("x7")
+legend("phi")
 
 subplot(5,2,8)
 plot(t,x8)
 grid on
 xlabel("Time(s)")
-legend("x8")
+legend("theta")
 
 subplot(5,2,[9 10])
 plot(t,x9)
 grid on
 xlabel("Time(s)")
-legend("x9")
+legend("psi")
 
 
 figure("Name","Commands")

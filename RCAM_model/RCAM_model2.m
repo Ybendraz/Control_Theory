@@ -1,4 +1,4 @@
-function XDOT  = RCAM_model(X,U)
+function XDOT  = RCAM_model2(X,U)
 
 % --------------------State and control vector--------------%
 
