@@ -20,10 +20,10 @@ U0 = [0;
         0.08;      % recall minimum for throttles are 0.5*pi/180 = 0.0087
         0.08];
 
-TF = 60;
+TF = 200;
 
 %% Run the model:
-sim('RCAM_SimulinkModel_MeasurementsIncluded.slx')
+sim('RCAM_SimulinkModel.slx')
 
 %% Plot the results:
 
