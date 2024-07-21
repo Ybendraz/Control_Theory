@@ -4,6 +4,8 @@ clc
 close all
 %% Define Constants
 g = 9.81;
+
+% Initial state value
 X0 = [100;       % approx 165 knots
     0;
     0; 
@@ -12,8 +14,12 @@ X0 = [100;       % approx 165 knots
     0;
     0;
     0.1;        % approx 5.73 deg
+    0;
+    0;
+    0;
     0];
-XYZ0 = [0;0;0]; % Initial NED postion of the COG
+
+% Initial command value
 U0 = [0;
         -0.1;      % approx -5.73 deg
         0;
