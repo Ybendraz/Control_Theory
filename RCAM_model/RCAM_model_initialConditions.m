@@ -17,7 +17,7 @@ X0 = [100;       % approx 165 knots
     0;
     0;
     0;
-    0];
+    -2000];
 
 % Initial command value
 U0 = [0;
