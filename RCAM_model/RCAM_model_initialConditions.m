@@ -3,6 +3,12 @@ clear
 clc
 close all
 %% Define Constants
+% Xcg = 0.23*cbar;        %x position of CoG in Fm (m)
+% Ycg = 0;                %y position of CoG in Fm (m)
+% Zcg = 0.10*cbar;        %z position of CoG in Fm (m)
+% m = 120000;
+% 
+% var_params = [m,Xcg,Ycg,Zcg];
 g = 9.81;
 
 % Initial state value
@@ -14,10 +20,8 @@ X0 = [100;       % approx 165 knots
     0;
     0;
     0.1;        % approx 5.73 deg
-    0;
-    0;
-    0;
-    -2000];
+    0
+    ];
 
 % Initial command value
 U0 = [0;
