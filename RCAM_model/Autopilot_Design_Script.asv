@@ -24,7 +24,7 @@ D_longi = RCAM_OP1_SS.D(idx_longi,idx_long_inputs);
 
 RCAM_OP1_LONG = ss(A_longi,B_longi,C_longi,D_longi);
 RCAM_OP1_LONG.InputName = {'dT','dTh1','dTh2'};
-RCAM_OP1_LONG.OutputName = {'u','v','q','theta'};
+RCAM_OP1_LONG.OutputName = {'u','W','q','theta'};
 %save("03-Trim&Linearization\RCAM_OP1_LONG","RCAM_OP1_LONG")
 damp(A_longi)
 [V,~] = eig(A_longi);
@@ -35,7 +35,9 @@ damp(A_longi)
 % Modifications have been added to RCAM_OP1_LONG to output airspeed, flight
 % path (gamma), AoA (alpha) and pitch rate (q)
 
+% Testing a +/-1deg elevetor doublet from the trim position
 Elevator_doublet = 1; %
+Throttle_man = 0;
 Tsim = 30; 
 sim("RCAM_OP1_LONG.slx")
 % Plot results:
@@ -55,34 +57,113 @@ subplot(1,3,1)
 plot(t,u1)
 grid on
 xlabel("Time(s)")
-ylabel("dT: elevator deflection")
+ylabel("\deltaT: elevator deflection")
 subplot(1,3,2)
 plot(t,u2)
-ylabel("dTh1: throl")
 grid on
 xlabel("Time(s)")
+ylabel("\deltaTh1: throttle one's deflection")
 subplot(1,3,3)
 plot(t,u3)
 grid on
 xlabel("Time(s)")
+ylabel("\deltaTh2: throttle two's deflection")
 
 figure("Name","Longitudinal outputs")
 subplot(2,2,1)
 plot(t,y1)
 grid on
 xlabel("Time(s)")
+ylabel("V: Airspeed")
 subplot(2,2,2)
 plot(t,y2)
 grid on
 xlabel("Time(s)")
+ylabel("\alpha: AoA")
 subplot(2,2,3)
 plot(t,y3)
 grid on
 xlabel("Time(s)")
+ylabel("\gamma: flight path")
 subplot(2,2,4)
 plot(t,y4)
 grid on
 xlabel("Time(s)")
+ylabel("Q: pitch rate")
+
+
+% Testing a 1->0 deg throttles positionning:
+
+Elevator_doublet = 0; %
+Throttle_man = 1;
+Tsim = 30; 
+sim("RCAM_OP1_LONG.slx")
+% Plot results:
+t = ans.tout;
+
+u1 = ans.simU_LONGI.Data(:,1);
+u2 = ans.simU_LONGI.Data(:,2);
+u3 = ans.simU_LONGI.Data(:,3);
+
+y1 = ans.simY_LONGI.Data(:,1);
+y2 = ans.simY_LONGI.Data(:,2);
+y3 = ans.simY_LONGI.Data(:,3);
+y4 = ans.simY_LONGI.Data(:,4);
+
+figure("Name","Longitudinal inputs")
+subplot(1,3,1)
+plot(t,u1)
+grid on
+xlabel("Time(s)")
+ylabel("\deltaT: elevator deflection")
+subplot(1,3,2)
+plot(t,u2)
+grid on
+xlabel("Time(s)")
+ylabel("\deltaTh1: throttle one's deflection")
+subplot(1,3,3)
+plot(t,u3)
+grid on
+xlabel("Time(s)")
+ylabel("\deltaTh2: throttle two's deflection")
+
+figure("Name","Longitudinal outputs")
+subplot(2,2,1)
+plot(t,y1)
+grid on
+xlabel("Time(s)")
+ylabel("V: Airspeed")
+subplot(2,2,2)
+plot(t,y2)
+grid on
+xlabel("Time(s)")
+ylabel("\alpha: AoA")
+subplot(2,2,3)
+plot(t,y3)
+grid on
+xlabel("Time(s)")
+ylabel("\gamma: flight path")
+subplot(2,2,4)
+plot(t,y4)
+grid on
+xlabel("Time(s)")
+ylabel("Q: pitch rate")
+
+%% Design objectives:
+% 
+%
+%% Longitudinal autopilot design:
+% Plotting open loop poles and zeros:
+%zpk(RCAM_OP1_LONG)
+plot(eig(RCAM_OP1_LONG),'x','LineWidth',2)
+grid on
+xlabel("Re")
+ylabel("Im")
+
+% the pitch is only impacted by the elevator input, we can start by setting
+% the q, theta loop:
+G_q_dT = tf(RCAM_OP1_LONG(4,2));
+%
 %% Lateral model
 % idx_lat_inputs = [1 3];
 % A_lat = RCAM_OP1_SS.A(idx_lat,idx_lat);
