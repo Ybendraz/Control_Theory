@@ -1,0 +1,111 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Autopilot design script %%%%%%%%%%%%%%%%%%%%%
+% Author : BENDRAZ Yahia
+% Date of the creation of the document : 22/12/2024
+clc
+clear
+close all
+% loading linearized model at OP 001
+addpath("03-Trim&Linearization\")
+load("RCAM_LIN_MODEL_001.mat")
+%% Dynamics analysis:
+idx_longi = [1 3 5 8];
+idx_lat = [2 4 6 7];
+
+%% Verifying decoupling criteria for control design:
+long_lat_dir = [idx_longi idx_lat 9];
+RCAM_OP1_TRANSFORM = ss(RCAM_OP1_SS.A(long_lat_dir,long_lat_dir),RCAM_OP1_SS.B(long_lat_dir,:),RCAM_OP1_SS.C(long_lat_dir,long_lat_dir),RCAM_OP1_SS.D(long_lat_dir,:));
+% Decoupling criteria is verified
+%% Longitudinal model:
+idx_long_inputs = [2 4 5];
+A_longi = RCAM_OP1_SS.A(idx_longi,idx_longi);
+B_longi = RCAM_OP1_SS.B(idx_longi,idx_long_inputs);
+C_longi = RCAM_OP1_SS.C(idx_longi,idx_longi);
+D_longi = RCAM_OP1_SS.D(idx_longi,idx_long_inputs);
+
+RCAM_OP1_LONG = ss(A_longi,B_longi,C_longi,D_longi);
+RCAM_OP1_LONG.InputName = {'dT','dTh1','dTh2'};
+RCAM_OP1_LONG.OutputName = {'u','v','q','theta'};
+%save("03-Trim&Linearization\RCAM_OP1_LONG","RCAM_OP1_LONG")
+damp(A_longi)
+[V,~] = eig(A_longi);
+%abs(V(:,1))
+%abs(V(:,3))
+
+%% Longitudinal behavior analysis (Time response simulations) :
+% Modifications have been added to RCAM_OP1_LONG to output airspeed, flight
+% path (gamma), AoA (alpha) and pitch rate (q)
+
+Elevator_doublet = 1; %
+Tsim = 30; 
+sim("RCAM_OP1_LONG.slx")
+% Plot results:
+t = ans.tout;
+
+u1 = ans.simU_LONGI.Data(:,1);
+u2 = ans.simU_LONGI.Data(:,2);
+u3 = ans.simU_LONGI.Data(:,3);
+
+y1 = ans.simY_LONGI.Data(:,1);
+y2 = ans.simY_LONGI.Data(:,2);
+y3 = ans.simY_LONGI.Data(:,3);
+y4 = ans.simY_LONGI.Data(:,4);
+
+figure("Name","Longitudinal inputs")
+subplot(1,3,1)
+plot(t,u1)
+grid on
+xlabel("Time(s)")
+ylabel("\deltaT: elevator deflection")
+subplot(1,3,2)
+plot(t,u2)
+grid on
+xlabel("Time(s)")
+ylabel("\deltaTh1: throttle one's deflection")
+subplot(1,3,3)
+plot(t,u3)
+grid on
+xlabel("Time(s)")
+ylabel("\deltaTh2: throttle two's deflection")
+
+figure("Name","Longitudinal outputs")
+subplot(2,2,1)
+plot(t,y1)
+grid on
+xlabel("Time(s)")
+ylabel("V: Airspeed")
+subplot(2,2,2)
+plot(t,y2)
+grid on
+xlabel("Time(s)")
+ylabel("\alpha: AoA")
+subplot(2,2,3)
+plot(t,y3)
+grid on
+xlabel("Time(s)")
+ylabel("\gamma: flight path")
+subplot(2,2,4)
+plot(t,y4)
+grid on
+xlabel("Time(s)")
+ylabel("Q: pitch rate")
+%% Lateral model
+% idx_lat_inputs = [1 3];
+% A_lat = RCAM_OP1_SS.A(idx_lat,idx_lat);
+% B_lat = RCAM_OP1_SS.B(idx_lat,idx_lat_inputs);
+% C_lat = RCAM_OP1_SS.C(idx_lat,idx_lat);
+% D_lat = RCAM_OP1_SS.D(idx_lat,idx_lat_inputs);
+% 
+% RCAM_OP1_LAT = ss(A_lat,B_lat,C_lat,D_lat);
+% save("03-Trim&Linearization\RCAM_OP1_LONG","RCAM_OP1_LONG")
+% damp(A_lat)
+
+%% Design objectives:
+
+
+%% Inner loops 
+
+%% Outer loops
+
+%% Result & Analysis
+
+%% Non linear analysis & Tuning
