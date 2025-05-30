@@ -1,1 +1,1 @@
-exportMatStructsRecursive('E:\ws_control_theory\Control_Theory\AC_GENERIC_MODEL\04_Data\csv\template\GlobalStruct_template.mat',"")
+exportMatStructsRecursive_safe('E:\ws_control_theory\Control_Theory\AC_GENERIC_MODEL\04_Data\csv\template\GlobalStruct_template.mat',"")

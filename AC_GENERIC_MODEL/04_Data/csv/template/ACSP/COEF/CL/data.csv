@@ -1,7 +1,7 @@
 Name,Value
-Clb,-3
-Clp,-15
-Clr0,5
-Clra,35
-Clda,-0.7
-Cldr,0.2
+CL0,0.9
+CLa,5.5
+CLq,3.3
+CLh,0.2
+lambdah,0.12
+CLde,0.32
