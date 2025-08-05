@@ -11,4 +11,4 @@ addpath("04_Data\csv\template\")
 ACSP = importStructFromFolder('04_Data\csv\template\ACSP');
 
 % Open the simulink model:
-load ACS
+open("ACS_AP.slx")
