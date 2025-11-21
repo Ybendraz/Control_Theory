@@ -37,8 +37,8 @@ U0 = [0;
         0;
         0.1;      % recall minimum for throttles are 0.5*pi/180 = 0.0087
         0.1];
-
 TF = 500;
+
 
 %% Operating point & linearizations:
 id_long = [1 3 5 8];
@@ -50,10 +50,13 @@ id_output_lat = 6:9 ;
 id_act_lat = [1 3];
 id_act_long = [2 4 5];
 
+%[Xeq,Ueq,Yeq,dx] = trim("RCAM_Model",X0,U0,Y0,[],[2 4 5],[]);
+%X0 = round(Xeq,1);
+%U0 = round(Ueq,1);
 RCAM_LIN_OP = linmod("RCAM_Model",X0,U0);
 RCAM_LIN_SYS = ss(RCAM_LIN_OP.a,RCAM_LIN_OP.b,RCAM_LIN_OP.c,RCAM_LIN_OP.d);
 RCAM_LIN_SYS.InputName = {'dA','dE','dR','dTh1','dTh2'};
-RCAM_LIN_SYS.OutputName = {'Va','Vz','nz','q','gamma','beta','p','r','phi'};
+RCAM_LIN_SYS.OutputName = {'Va','Vz','q','nz','gamma','beta','p','r','phi'};
 
 RCAM_LIN_LONG = modred(RCAM_LIN_SYS(id_output_long,id_act_long),[id_lat 9],'truncate');
 RCAM_LIN_LAT = modred(RCAM_LIN_SYS(id_output_lat,id_act_lat),[id_long 9],'truncate');

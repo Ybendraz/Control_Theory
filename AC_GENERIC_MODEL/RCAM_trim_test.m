@@ -50,4 +50,3 @@ TF = 200;
 
 %% trim the model:
 
-[linAC,Xeq,Ueq] = trimAC('RCAM_Model',X0,U0);

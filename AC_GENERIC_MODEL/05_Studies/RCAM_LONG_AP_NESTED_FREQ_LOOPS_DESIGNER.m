@@ -60,8 +60,8 @@ State_mod_map
 %----------------------------------------------------------------
 % Note:
 % u -> Phugoïd (1) + Short-mode (2)
-% v -> Short-mode (1) + Phugoïd (2)
-% q -> Short-mode (1) + Phugoïd (2)
+% v -> Short-mode (1) + Phugoïd (2) (v = u*alpha)
+% q -> Short-mode (1) + Phugoïd (2) 
 % theta -> Short-mode (1) + Phugoïd (2)
 %----------------------------------------------------------------
 
@@ -76,8 +76,8 @@ end
 %% Time response of the open-loop:
 
 for i=1:4
-    figure(State_mod_map)
-    step(deg2rad(1)*RCAM_LIN_LONG_TF(i,:));
+    figure()
+    step(deg2rad(1)*RCAM_LIN_LONG_TF(i,:),100);
     grid on
 end
 
@@ -110,3 +110,34 @@ tr_V = 15;
 tr_Vz = 10;
 w_V_loop = 4/(xi*tr_V);
 w_Vz_loop = 4/(xi*tr_Vz);
+
+%% the short mode period is 15 faster than the phugoid, both mode can be dynamicaly seperated:
+RCAM_LIN_LONG_bal = balreal(RCAM_LIN_LONG);
+RCAM_LIN_LONG_SM = modred(RCAM_LIN_LONG_bal,[1 2],"truncate");
+% The control of the vertical axis is done through commanding a vertical
+% acceleration using the elevator channel:
+H_nz = 1;
+RCAM_LIN_LONG_SM = RCAM_LIN_LONG_SM([3 4],1);
+Kx = place(RCAM_LIN_LONG_SM.a,RCAM_LIN_LONG_SM.b,roots([1 2*xi*w_short_mode w_short_mode^2]));
+K_nzq = Kx/(RCAM_LIN_LONG_SM.c-Kx*RCAM_LIN_LONG_SM.d);
+
+RCAM_LIN_LONG_SM_CL = linmod("RCAM_OP_LONG_AP_SM_CL");
+RCAM_LIN_LONG_SM_CL = ss(RCAM_LIN_LONG_SM_CL.a,RCAM_LIN_LONG_SM_CL.b,RCAM_LIN_LONG_SM_CL.c,RCAM_LIN_LONG_SM_CL.d);
+%damp(RCAM_LIN_LONG_SM_CL)
+H_nz = 1/dcgain(RCAM_LIN_LONG_SM_CL);
+
+figure();step(H_nz*RCAM_LIN_LONG_SM_CL)
+
+RCAM_LIN_LONG_SM_CL_FULL = linmod("RCAM_OP_LONG_AP_SM_CL_FULL");
+RCAM_LIN_LONG_SM_CL_FULL = ss(RCAM_LIN_LONG_SM_CL_FULL.a,RCAM_LIN_LONG_SM_CL_FULL.b,RCAM_LIN_LONG_SM_CL_FULL.c,RCAM_LIN_LONG_SM_CL_FULL.d);
+damp(RCAM_LIN_LONG_SM_CL_FULL)
+figure();step(RCAM_LIN_LONG_SM_CL_FULL)
+
+
+%% Synthèse de la boucle en Vz: (contrôle du mode phugoïde)
+RCAM_LIN_LONG_Vz = linmod('RCAM_OP_LONG_AP_Vz_OL');
+RCAM_LIN_LONG_Vz = ss(RCAM_LIN_LONG_Vz.a,RCAM_LIN_LONG_Vz.b,RCAM_LIN_LONG_Vz.c,RCAM_LIN_LONG_Vz.d);
+RCAM_LIN_LONG_Vz = balreal(RCAM_LIN_LONG_Vz); 
+
+damp()
+

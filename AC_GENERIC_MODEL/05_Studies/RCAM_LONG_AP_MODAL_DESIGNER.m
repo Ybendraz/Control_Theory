@@ -10,6 +10,7 @@ run RCAM_model_trim.m
 clear RCAM_LIN_OP id_act_lat id_output_lat id_lat RCAM_LIN_SYS RCAM_LIN_LAT
 
 %% Analysis of longitudinal open_loop:
+Y0_long = RCAM_LIN_LONG.C*X0(id_long)+RCAM_LIN_LONG.D*U0(id_act_long);
 [V_long,D_long,W_long] = eig(RCAM_LIN_LONG.A);
 w_1 = abs(D_long(1,1));
 w_2 = abs(D_long(3,3));
@@ -32,11 +33,12 @@ w_2
 display("mode N°2 damping:")
 xi_2
 
-
+figure("Name","Poles/Zeros mapping - open loop")
+pzmap(RCAM_LIN_LONG)
 %% We can almost immediately notice that the mode number 1 is the short mode
 % characterized with a 1.56 rad/s and 0.48 damping coefficient.
 % As for the phugoid mode, its characteristic frequency is equal to 0.5
-% rad/s with a very damping coefficient equal to 0.0933.
+% rad/s with a very low damping coefficient equal to 0.0933.
 
 %----------------------------------------------------------------
 % Analysis of the modal composition of the matrices A,B,C and D
@@ -76,8 +78,8 @@ end
 %% Time response of the open-loop:
 
 for i=1:4
-    figure(State_mod_map)
-    step(deg2rad(1)*RCAM_LIN_LONG_TF(i,:));
+    figure("Name","State_mod_map")
+    step(deg2rad(1)*RCAM_LIN_LONG_TF(i,:),100);
     grid on
 end
 
@@ -106,8 +108,8 @@ end
 
 xi = sqrt(2)/2;
 w_short_mode = 1.2*w_1;
-tr_V = 15;
-tr_Vz = 10;
+tr_V = 20;
+tr_Vz = 15;
 w_V_loop = 4/(xi*tr_V);
 w_Vz_loop = 4/(xi*tr_Vz);
 
@@ -123,34 +125,20 @@ m = size(ol_integral.b,2);
 VW = zeros(n+m,n);
 
 for i = 1:n
-    if (i == 5 || i == 6)
+    if (i == 3 || i == 4)
         eig_v = null([ol_integral.a - cl_poles(i)*eye(n) ol_integral.b;ol_integral.c(2,:) zeros(1,m)]);
         VW(:,i) = mean(eig_v,2);
-    elseif (i == 7 || i == 8)
-        eig_v = null([ol_integral.a - cl_poles(i)*eye(n) ol_integral.b;ol_integral.c(1,:) zeros(1,m)]);
-        VW(:,i) = mean(eig_v,2);
     else
-        eig_v = null([ol_integral.a - cl_poles(i)*eye(n) ol_integral.b]);
+        eig_v = null([ol_integral.a - cl_poles(i)*eye(n) ol_integral.b;ol_integral.c(1,:) zeros(1,m)]);
         VW(:,i) = mean(eig_v,2);
     end
 end
 
-VW(:,2) = conj(VW(:,1));
-VW(:,4) = conj(VW(:,3));
-VW(:,6) = conj(VW(:,5));
 
 K_long1_y= real(-VW(n+1:n+m,:)*inv(ol_integral.c*VW(1:n,:)+ol_integral.d*VW(n+1:n+m,:)));
-K_long1_x= real(-VW(n+1:n+m,:)*inv(VW(1:n,:)));
 
-% Solution whithout decoupling constraints:
-K_long2_x = place(ol_integral.a,ol_integral.b,cl_poles); % u=K_x*X+H*e = K_y*Y+H*e
-K_long2_y = K_long2_x/(ol_integral.c-ol_integral.D*K_long2_x);
-
-%% Optimal gain based on LQR :
-Q = diag([0.05 0.1 0.1 0.05 0.05 0.1]);
-R = diag([1 10 10]);
-K_long_lqr_x = lqr(ol_integral.a,ol_integral.b,Q,R,[])
-K_long_lqr_y = K_long_lqr_x/(ol_integral.c-ol_integral.D*K_long2_x);
+RCAM_Model_AP_CL = feedback(ol_integral,K_long1_y);
+damp(RCAM_Model_AP_CL)
 
 %% Feedforward gain computation:
 H_long_1 = eye(2);
@@ -158,4 +146,6 @@ cl_integral = linmod('RCAM_OP_LONG_AP_MODAL_CL');
 cl_integral = ss(cl_integral.a,cl_integral.b,cl_integral.c,cl_integral.d);
 damp(cl_integral);
 H_long_1 = inv(dcgain(cl_integral));
-
+%%
+[A,B,C,D]=linmod('RCAM_Model_AP_LONG_NL');  % linéarisation autour de x0
+damp(A)
